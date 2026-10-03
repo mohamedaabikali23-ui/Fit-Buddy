@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HERO BANNER -->
+<section class="hero-header">
+  <div class="hero-title">
+    <span>⚡ FitBuddy: AI Fitness & Nutrition Architect</span>
+    <span class="badge badge-emerald">Live SQLite DB</span>
+  </div>
+  <p class="hero-subtitle">
+    Hyper-personalized training routines, precision metabolic nutrition blueprints, and conversational AI coaching. 
+    Powered by <b>FastAPI</b>, <b>SQLAlchemy</b>, <b>Jinja2</b>, and <b>Google Gemini 3.8 Flash</b>.
+  </p>
+</section>
+
+<!-- QUICK PERSONA PRESETS -->
+<div class="preset-bar">
+  <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Quick Presets:</span>
+  {% for p_name in presets.keys() %}
+  <button type="button" class="preset-chip {% if p_name == 'Fat Loss & Conditioning' %}active{% endif %}" data-preset="{{ p_name }}">
+    🎯 {{ p_name }}
+  </button>
+  {% endfor %}
+</div>
+
+<!-- TABS NAVIGATION -->
+<nav class="tabs-nav" aria-label="FitBuddy Navigation Tabs">
+  <button class="tab-btn active" data-tab="tabProfile">
+    <span>📋</span> Biometrics & Profile
+  </button>
+  <button class="tab-btn" data-tab="tabWorkout">
+    <span>🏋️</span> Workout Blueprint
+  </button>
+  <button class="tab-btn" data-tab="tabNutrition">
+    <span>🥗</span> Nutrition Blueprint
+  </button>
+  <button class="tab-btn" data-tab="tabCoach">
+    <span>💬</span> FitBuddy AI Coach
+  </button>
+  <button class="tab-btn" data-tab="tabHistory">
+    <span>📑</span> Dossier & History
+  </button>
+</nav>
+
+<!-- TAB 1: BIOMETRICS & PROFILE -->
+<div id="tabProfile" class="tab-pane active">
+  <div class="grid-2">
+    <!-- LEFT: Assessment Form -->
+    <div class="card">
+      <h3 class="card-title">👤 Athlete Assessment & Constraints</h3>
+      <p class="card-subtitle">Adjust your biometrics to update deterministic metabolic calculations saved in SQLite.</p>
+
+      <form id="profileForm">
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="inputAge">Age (years)</label>
+            <input type="number" id="inputAge" name="age" class="form-control" min="14" max="95" value="{{ profile.age }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="selectGender">Biological Gender</label>
+            <select id="selectGender" name="gender" class="form-control">
+              <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputHeight">Height (cm)</label>
+            <input type="number" step="0.5" id="inputHeight" name="height_cm" class="form-control" min="120" max="230" value="{{ profile.height_cm }}" required>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 0.5rem;">
+          <div class="form-group">
+            <label class="form-label" for="inputWeight">Current Weight (kg)</label>
+            <input type="number" step="0.5" id="inputWeight" name="weight_kg" class="form-control" min="35" max="250" value="{{ profile.weight_kg }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputTargetWeight">Target Goal Weight (kg)</label>
+            <input type="number" step="0.5" id="inputTargetWeight" name="target_weight_kg" class="form-control" min="35" max="250" value="{{ profile.target_weight_kg }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="selectGoal">Primary Objective</label>
+          <select id="selectGoal" name="goal" class="form-control">
+            <option value="Fat Loss / Caloric Deficit" {% if 'Fat' in profile.goal %}selected{% endif %}>Fat Loss / Caloric Deficit</option>
+            <option value="Muscle Gain / Hypertrophy" {% if 'Muscle' in profile.goal %}selected{% endif %}>Muscle Gain / Hypertrophy</option>
+            <option value="Body Recomposition (Lose Fat + Build Muscle)" {% if 'Recomp' in profile.goal %}selected{% endif %}>Body Recomposition</option>
+            <option value="Cardiovascular Endurance" {% if 'Endurance' in profile.goal %}selected{% endif %}>Cardiovascular Endurance</option>
+            <option value="General Fitness & Mobility" {% if 'General' in profile.goal %}selected{% endif %}>General Fitness & Mobility</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="selectActivity">Daily Activity Multiplier</label>
+          <select id="selectActivity" name="activity_level" class="form-control">
+            <option value="Sedentary (desk job, little to no exercise)">Sedentary (desk job, little to no exercise)</option>
+            <option value="Lightly Active (1-3 days exercise/week)">Lightly Active (1-3 days exercise/week)</option>
+            <option value="Moderately Active (3-5 days exercise/week)" selected>Moderately Active (3-5 days exercise/week)</option>
+            <option value="Very Active (6-7 days hard exercise/week)">Very Active (6-7 days hard exercise/week)</option>
+            <option value="Extremely Active (athlete / physical labor job)">Extremely Active (athlete / physical labor job)</option>
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="selectExperience">Experience Level</label>
+            <select id="selectExperience" name="experience" class="form-control">
+              <option value="Beginner (< 6 months)" {% if 'Beg' in profile.experience %}selected{% endif %}>Beginner (< 6 months)</option>
+              <option value="Intermediate (1 - 3 years)" {% if 'Inter' in profile.experience %}selected{% endif %}>Intermediate (1 - 3 years)</option>
+              <option value="Advanced (3+ years)" {% if 'Adv' in profile.experience %}selected{% endif %}>Advanced (3+ years)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="selectEquipment">Available Equipment</label>
+            <select id="selectEquipment" name="equipment" class="form-control">
+              <option value="Full Gym Access" {% if 'Full' in profile.equipment %}selected{% endif %}>Full Gym Access</option>
+              <option value="Dumbbells & Bench" {% if 'Dumbbell' in profile.equipment %}selected{% endif %}>Dumbbells & Bench</option>
+              <option value="Bodyweight & Resistance Bands" {% if 'Body' in profile.equipment %}selected{% endif %}>Bodyweight & Resistance Bands</option>
+              <option value="Kettlebells Only" {% if 'Kettle' in profile.equipment %}selected{% endif %}>Kettlebells Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between;">
+              <label class="form-label" for="inputDays">Training Days / Week</label>
+              <span id="daysBadge" class="badge badge-emerald">{{ profile.days_per_week }} Days</span>
+            </div>
+            <input type="range" id="inputDays" name="days_per_week" class="form-control" min="2" max="6" value="{{ profile.days_per_week }}">
+          </div>
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between;">
+              <label class="form-label" for="inputDuration">Session Length</label>
+              <span id="durationBadge" class="badge badge-cyan">{{ profile.session_duration_mins }} Mins</span>
+            </div>
+            <input type="range" id="inputDuration" name="session_duration_mins" class="form-control" min="20" max="90" step="5" value="{{ profile.session_duration_mins }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="selectDiet">Dietary Preference</label>
+          <select id="selectDiet" name="diet_type" class="form-control">
+            <option value="High Protein Omnivore" {% if 'Omnivore' in profile.diet_type %}selected{% endif %}>High Protein Omnivore</option>
+            <option value="Clean Bulking (High Carb & Protein)" {% if 'Bulking' in profile.diet_type %}selected{% endif %}>Clean Bulking (High Carb & Protein)</option>
+            <option value="Vegetarian" {% if 'Vegetarian' in profile.diet_type %}selected{% endif %}>Vegetarian</option>
+            <option value="Vegan (Plant-Based)" {% if 'Vegan' in profile.diet_type %}selected{% endif %}>Vegan (Plant-Based)</option>
+            <option value="Keto / Low-Carb" {% if 'Keto' in profile.diet_type %}selected{% endif %}>Keto / Low-Carb</option>
+            <option value="Mediterranean Balanced" {% if 'Med' in profile.diet_type %}selected{% endif %}>Mediterranean Balanced</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputInjuries">Physical Limitations / Joint Sensitivity</label>
+          <input type="text" id="inputInjuries" name="injuries" class="form-control" value="{{ profile.injuries }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+          💾 Save Profile & Recalculate Science
+        </button>
+      </form>
+    </div>
+
+    <!-- RIGHT: Deterministic Metabolic Science Dashboard -->
+    <div>
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 class="card-title">🔬 Metabolic Science Benchmarks</h3>
+        <p class="card-subtitle">Derived strictly from Mifflin-St Jeor formulas and WHO guidelines.</p>
+
+        <div class="grid-3" style="margin-bottom: 1.2rem;">
+          <div class="stat-box">
+            <div class="stat-label">Body Mass Index</div>
+            <div class="stat-value" id="statBmi">{{ profile.bmi }}</div>
+            <span class="badge badge-cyan" id="statBmiCat" style="font-size: 0.65rem; margin-top: 0.3rem;">{{ profile.bmi_category }}</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Basal Metabolic Rate</div>
+            <div class="stat-value" id="statBmr">{{ profile.bmr }}<span class="stat-unit">kcal</span></div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Resting Expenditure</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Daily Burn (TDEE)</div>
+            <div class="stat-value" id="statTdee">{{ profile.tdee }}<span class="stat-unit">kcal</span></div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Active Expenditure</span>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 1.5rem;">
+          <div class="stat-box" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08);">
+            <div class="stat-label" style="color: #34d399;">Calorie Target</div>
+            <div class="stat-value" id="statTargetCals" style="color: #34d399;">{{ profile.target_calories }}<span class="stat-unit" style="color: #34d399;">kcal</span></div>
+            <span class="badge badge-emerald" id="statCalMode" style="font-size: 0.65rem; margin-top: 0.3rem;">{{ profile.calorie_mode }}</span>
+          </div>
+          <div class="stat-box" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.08);">
+            <div class="stat-label" style="color: #38bdf8;">Daily Hydration</div>
+            <div class="stat-value" id="statHydration" style="color: #38bdf8;">{{ profile.hydration_l }}<span class="stat-unit" style="color: #38bdf8;">L</span></div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Minimum Water Intake</span>
+          </div>
+        </div>
+
+        <div class="macro-progress-container">
+          <h4 style="font-family: var(--font-display); font-size: 0.95rem; color: #ffffff; margin-bottom: 0.75rem;">Macronutrient Distribution</h4>
+          
+          <div class="macro-row">
+            <div class="macro-header">
+              <span style="color: #f43f5e;">🥩 Protein (Target: 2.0g/kg)</span>
+              <span id="macroProtein">{{ profile.protein_g }}g (30%)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill fill-protein" id="barProtein" style="width: 30%;"></div>
+            </div>
+          </div>
+
+          <div class="macro-row">
+            <div class="macro-header">
+              <span style="color: #38bdf8;">🍚 Carbohydrates (Fueling Glycogen)</span>
+              <span id="macroCarbs">{{ profile.carbs_g }}g (40%)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill fill-carbs" id="barCarbs" style="width: 40%;"></div>
+            </div>
+          </div>
+
+          <div class="macro-row">
+            <div class="macro-header">
+              <span style="color: #fbbf24;">🥑 Healthy Fats (Hormone Health)</span>
+              <span id="macroFats">{{ profile.fat_g }}g (30%)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill fill-fats" id="barFats" style="width: 30%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: WORKOUT BLUEPRINT -->
+<div id="tabWorkout" class="tab-pane">
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h3 class="card-title">🏋️ Personalized Training Architecture</h3>
+        <p class="card-subtitle">Generated specifically for your {{ profile.days_per_week }}-day split and equipment.</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btnGenWorkout" class="btn btn-primary">⚡ Generate AI Workout Split</button>
+        <button id="btnDemoWorkout" class="btn btn-secondary">📋 Load Demo Plan</button>
+      </div>
+    </div>
+
+    <div id="workoutDisplay" class="plan-display">
+      {% if latest_workout %}
+      {{ latest_workout.content_markdown | markdown | safe }}
+      {% else %}
+      <p style="color: var(--text-muted); text-align: center; padding: 3rem 1rem;">
+        👆 Click <b>Generate AI Workout Split</b> or <b>Load Demo Plan</b> to formulate your training split.
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: NUTRITION BLUEPRINT -->
+<div id="tabNutrition" class="tab-pane">
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h3 class="card-title">🥗 Precision Nutrition & Meal Blueprint</h3>
+        <p class="card-subtitle">Structured to hit your calibrated target of {{ profile.target_calories }} kcal / day.</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btnGenMeal" class="btn btn-primary">⚡ Generate AI Nutrition Plan</button>
+        <button id="btnDemoMeal" class="btn btn-secondary">📋 Load Demo Plan</button>
+      </div>
+    </div>
+
+    <div id="mealDisplay" class="plan-display">
+      {% if latest_meal %}
+      {{ latest_meal.content_markdown | markdown | safe }}
+      {% else %}
+      <p style="color: var(--text-muted); text-align: center; padding: 3rem 1rem;">
+        👆 Click <b>Generate AI Nutrition Plan</b> or <b>Load Demo Plan</b> to view your meal blueprint.
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: FITBUDDY AI COACH -->
+<div id="tabCoach" class="tab-pane">
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 class="card-title" style="margin-bottom: 0.2rem;">💬 FitBuddy AI Coach</h3>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Session memory & scientific sports nutrition advice powered by Google Gemini.</span>
+      </div>
+      <span class="badge badge-emerald">Live Coaching</span>
+    </div>
+
+    <div class="chat-window">
+      <div id="chatMessages" class="chat-messages">
+        <!-- Welcoming greeting -->
+        <div class="chat-bubble assistant">
+          <strong>Coach FitBuddy:</strong> Hello! I am your AI Strength & Conditioning Coach. 
+          I have your profile loaded ({{ profile.goal }} with {{ profile.equipment }}). 
+          Ask me about exercise technique, joint safety, protein timing, or recipe modifications!
+        </div>
+
+        {% for msg in chat_history %}
+        <div class="chat-bubble {{ msg.role }}">
+          {% if msg.role == 'assistant' %}<strong>Coach FitBuddy:</strong> {% endif %}
+          {{ msg.content | markdown | safe }}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Quick Prompt Starters -->
+      <div class="chat-prompt-chips">
+        <span style="font-size: 0.75rem; color: var(--text-muted); align-self: center;">Quick Starters:</span>
+        <button type="button" class="prompt-chip" data-prompt="How do I modify squats to protect my knees?">🛡️ Protect Knee Joints</button>
+        <button type="button" class="prompt-chip" data-prompt="What are 3 quick high-protein snacks for work?">🥩 Quick Protein Snacks</button>
+        <button type="button" class="prompt-chip" data-prompt="What should I eat 45 minutes before my workout?">⚡ Pre-Workout Fuel</button>
+        <button type="button" class="prompt-chip" data-prompt="How do I apply progressive overload safely?">📈 Progressive Overload Rules</button>
+      </div>
+
+      <!-- Chat input -->
+      <form id="chatForm" class="chat-input-bar">
+        <input type="text" id="chatInput" class="form-control" placeholder="Ask your coach anything about training, form, or nutrition..." autocomplete="off" required>
+        <button type="submit" class="btn btn-primary" style="padding: 0 1.5rem;">Send ⚡</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: DOSSIER & SQLITE HISTORY -->
+<div id="tabHistory" class="tab-pane">
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="card-title">📑 Export Regimen Dossier</h3>
+      <p class="card-subtitle">Download your complete biometric assessment, workout routine, and meal blueprint as a single clean Markdown file.</p>
+      
+      <div style="background: rgba(15, 23, 42, 0.6); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Includes: Mifflin-St Jeor metabolic math, BMI risk assessment, structured day-by-day training splits, 4-tier daily meals, and weekly grocery checklist.
+        </p>
+        <a href="/api/export" class="btn btn-primary" download="FitBuddy_Regimen_Dossier.md">
+          📥 Download Complete Dossier (.md)
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">🗄️ SQLite Database Records</h3>
+      <p class="card-subtitle">Persistently stored plans and audit log from <code>fitbuddy.db</code>.</p>
+
+      <h4 style="font-size: 0.9rem; color: #ffffff; margin-bottom: 0.5rem;">Saved Workout Plans:</h4>
+      <ul style="margin-left: 1.2rem; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        {% for w in saved_workouts %}
+        <li style="margin-bottom: 0.35rem;"><b>{{ w.title }}</b> (Created: {{ w.created_at.strftime('%Y-%m-%d %H:%M') }})</li>
+        {% else %}
+        <li style="color: var(--text-muted);">No saved workout routines yet.</li>
+        {% endfor %}
+      </ul>
+
+      <h4 style="font-size: 0.9rem; color: #ffffff; margin-bottom: 0.5rem;">Saved Nutrition Blueprints:</h4>
+      <ul style="margin-left: 1.2rem; color: var(--text-secondary); font-size: 0.85rem;">
+        {% for m in saved_meals %}
+        <li style="margin-bottom: 0.35rem;"><b>{{ m.title }}</b> (Target: {{ m.calorie_target }} kcal, {{ m.created_at.strftime('%Y-%m-%d %H:%M') }})</li>
+        {% else %}
+        <li style="color: var(--text-muted);">No saved meal blueprints yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

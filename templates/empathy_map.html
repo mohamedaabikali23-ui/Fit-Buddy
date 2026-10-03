@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empathy Map - FitBuddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #525659;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #111827;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    /* Top Floating Toolbar */
+    .toolbar {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      background: rgba(30, 41, 59, 0.92);
+      backdrop-filter: blur(8px);
+      padding: 10px 20px;
+      border-radius: 40px;
+      display: flex;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .toolbar a, .toolbar button {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .toolbar a:hover, .toolbar button:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    .toolbar button.secondary {
+      background: #334155;
+    }
+
+    .toolbar button.secondary:hover {
+      background: #475569;
+    }
+
+    .toolbar span {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    /* A4 Document Container */
+    .document-page {
+      background: #ffffff;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 18mm 20mm 16mm 20mm;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header Logos */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .logo-smartbridge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-smartbridge svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .sb-text-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #3b5998;
+      line-height: 1.1;
+    }
+
+    .sb-text-sub {
+      font-size: 9px;
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    .logo-skillwallet {
+      text-align: right;
+    }
+
+    .sw-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #0284c7;
+      line-height: 1.1;
+    }
+
+    .sw-title span {
+      color: #1e293b;
+    }
+
+    .sw-sub {
+      font-size: 8.5px;
+      color: #64748b;
+    }
+
+    /* Document Title */
+    .doc-title {
+      text-align: center;
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 22px;
+    }
+
+    /* Metadata Table */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+    }
+
+    .meta-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6.5px 12px;
+      font-size: 13px;
+    }
+
+    .meta-table td.col-label {
+      width: 28%;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .meta-table td.col-val {
+      width: 72%;
+      color: #0f172a;
+    }
+
+    .meta-table td.col-val strong {
+      color: #0284c7;
+    }
+
+    /* Subheading and Instructions */
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .instruction-text {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #334155;
+      margin-bottom: 18px;
+    }
+
+    /* Empathy Map 4-Quadrant Diagram */
+    .empathy-container {
+      position: relative;
+      border: 2px solid #000000;
+      flex-grow: 1;
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    /* Quadrant Cells */
+    .quadrant {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .quadrant-title {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #000000;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .quadrant-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: #1e293b;
+    }
+
+    .quadrant-list li {
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .quadrant-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: bold;
+      color: #000000;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    /* Specific Quadrant Themes (Matching Original Screenshot Exactly) */
+    .quadrant-says {
+      background-color: #d7eded;
+      border-right: 1.5px solid #000000;
+      border-bottom: 1.5px solid #000000;
+    }
+
+    .quadrant-thinks {
+      background-color: #d7eded;
+      border-left: 1.5px solid #000000;
+      border-bottom: 1.5px solid #000000;
+    }
+
+    .quadrant-does {
+      background-color: #faedd4;
+      border-right: 1.5px solid #000000;
+      border-top: 1.5px solid #000000;
+    }
+
+    .quadrant-feels {
+      background-color: #faedd4;
+      border-left: 1.5px solid #000000;
+      border-top: 1.5px solid #000000;
+    }
+
+    /* Center Badge (Persona Name) */
+    .center-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #e5e7eb;
+      border: 2px solid #000000;
+      padding: 10px 14px;
+      text-align: center;
+      width: 170px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+
+    .persona-badge-title {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #000000;
+      line-height: 1.2;
+    }
+
+    .persona-name-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0369a1;
+      margin-top: 4px;
+    }
+
+    .persona-role-tag {
+      font-size: 9.5px;
+      font-style: italic;
+      color: #475569;
+      margin-top: 2px;
+      line-height: 1.25;
+    }
+
+    /* Print Styles for Perfect A4 Output */
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .toolbar {
+        display: none !important;
+      }
+
+      .document-page {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        padding: 12mm 15mm;
+        page-break-after: avoid;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Helper Toolbar -->
+  <div class="toolbar">
+    <a href="/">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to FitBuddy Dashboard
+    </a>
+    <button onclick="window.print()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-8 0v4h8v-4H8z"/></svg>
+      Print / Save as PDF
+    </button>
+    <button class="secondary" onclick="copyQuadrantText()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+      Copy All Bullet Points
+    </button>
+  </div>
+
+  <!-- A4 Page Container -->
+  <div class="document-page" id="printableDoc">
+
+    <!-- Header Section with Logos -->
+    <div class="header-bar">
+      <!-- SmartBridge Logo -->
+      <div class="logo-smartbridge">
+        <svg viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="44" stroke="#0077B6" stroke-width="6" stroke-dasharray="70 20"/>
+          <path d="M30 65 C 40 30, 60 70, 70 35" stroke="#E63946" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="70" cy="35" r="7" fill="#2A9D8F"/>
+          <circle cx="30" cy="65" r="7" fill="#E76F51"/>
+        </svg>
+        <div>
+          <div class="sb-text-title">SMARTBRIDGE</div>
+          <div class="sb-text-sub">Let's Bridge the Gap</div>
+        </div>
+      </div>
+
+      <!-- Skill Wallet Logo -->
+      <div class="logo-skillwallet">
+        <div class="sw-title">SKILL <span>WALLET</span></div>
+        <div class="sw-sub">A SmartBridge Product</div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="doc-title">Empathy Map</h1>
+
+    <!-- Metadata Table -->
+    <table class="meta-table">
+      <tr>
+        <td class="col-label">Date</td>
+        <td class="col-val">15 March 2024</td>
+      </tr>
+      <tr>
+        <td class="col-label">Team ID</td>
+        <td class="col-val">SB-FIT-2024-08</td>
+      </tr>
+      <tr>
+        <td class="col-label">Project Name</td>
+        <td class="col-val"><strong>FitBuddy &ndash; AI-Powered Fitness & Nutrition Architect</strong></td>
+      </tr>
+      <tr>
+        <td class="col-label">Maximum Marks</td>
+        <td class="col-val">4 Marks</td>
+      </tr>
+    </table>
+
+    <!-- Description -->
+    <div class="section-title">Empathy Map</div>
+    <p class="instruction-text">
+      Create an empathy map to understand your customer/user from four perspectives &ndash; what they 
+      Say, Think, Do, and Feel &ndash; in relation to the problem your project addresses. This helps 
+      the team build a customer-centric solution.
+    </p>
+
+    <!-- 4-Quadrant Empathy Map Grid -->
+    <div class="empathy-container">
+
+      <!-- Center Persona Badge -->
+      <div class="center-badge">
+        <div class="persona-badge-title">PERSONA NAME</div>
+        <div class="persona-name-tag">Alex Carter (28)</div>
+        <div class="persona-role-tag">(Working Professional / Fitness Novice)</div>
+      </div>
+
+      <!-- SAYS (Top Left) -->
+      <div class="quadrant quadrant-says">
+        <div class="quadrant-title">SAYS</div>
+        <ul class="quadrant-list">
+          <li>"I don't have 2 hours a day to spend at the gym or cook complicated diet recipes."</li>
+          <li>"Personal trainers and private clinical dietitians are way too expensive for my monthly budget."</li>
+          <li>"There is so much conflicting advice on social media; I don't know what actually works for my body type."</li>
+          <li>"I want a routine that takes into account my knee and lower-back stiffness without risking injury."</li>
+          <li>"I just need a simple, realistic meal plan using regular groceries that fit my dietary preferences."</li>
+        </ul>
+      </div>
+
+      <!-- THINKS (Top Right) -->
+      <div class="quadrant quadrant-thinks">
+        <div class="quadrant-title">THINKS</div>
+        <ul class="quadrant-list">
+          <li>"Am I executing these exercises with safe posture, or am I just setting myself up for injury?"</li>
+          <li>"Generic 2,000-calorie diet plans online never match my metabolism or daily energy levels."</li>
+          <li>"I wish I had a private, 24/7 AI coach I could ask basic questions to without feeling judged."</li>
+          <li>"Will I be able to stay disciplined this time, or will I burn out and quit after two weeks?"</li>
+          <li>"Why am I working out consistently without seeing noticeable reduction in body fat?"</li>
+        </ul>
+      </div>
+
+      <!-- DOES (Bottom Left) -->
+      <div class="quadrant quadrant-does">
+        <div class="quadrant-title">DOES</div>
+        <ul class="quadrant-list">
+          <li>Downloads multiple calorie and fitness tracking apps, but drops them within a week due to manual friction.</li>
+          <li>Spends 30+ minutes scrolling YouTube and Instagram reels trying to piece together a workout routine.</li>
+          <li>Lifts weights or does bodyweight circuits without structured progressive overload, sets, or rest timers.</li>
+          <li>Tries extreme crash diets (keto, severe caloric cuts), but rebounds due to fatigue and unsustainable restriction.</li>
+          <li>Frequently skips workout sessions whenever overtime work piles up because routines aren't flexible.</li>
+        </ul>
+      </div>
+
+      <!-- FEELS (Bottom Right) -->
+      <div class="quadrant quadrant-feels">
+        <div class="quadrant-title">FEELS</div>
+        <ul class="quadrant-list">
+          <li><strong>Overwhelmed:</strong> By contradictory fitness advice, calorie counting, and complex workout jargon.</li>
+          <li><strong>Intimidated & Self-Conscious:</strong> Entering crowded gym weight rooms without clear instruction or form cues.</li>
+          <li><strong>Frustrated:</strong> Putting in effort for weeks without visible fat loss or muscle tone due to improper metabolic balance.</li>
+          <li><strong>Guilty & Demotivated:</strong> Whenever skipping consecutive workout days due to exhaustion or long work hours.</li>
+          <li><strong>Hopeful & Eager:</strong> For a personalized, scientifically backed, and flexible system that adapts to their lifestyle.</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function copyQuadrantText() {
+      const text = `PROJECT: FitBuddy - AI-Powered Fitness & Nutrition Architect
+DATE: 15 March 2024
+PERSONA: Alex Carter (Age 28, Working Professional / Fitness Novice)
+
+[SAYS]
+• "I don't have 2 hours a day to spend at the gym or cook complicated diet recipes."
+• "Personal trainers and private clinical dietitians are way too expensive for my monthly budget."
+• "There is so much conflicting advice on social media; I don't know what actually works for my body type."
+• "I want a routine that takes into account my knee and lower-back stiffness without risking injury."
+• "I just need a simple, realistic meal plan using regular groceries that fit my dietary preferences."
+
+[THINKS]
+• "Am I executing these exercises with safe posture, or am I just setting myself up for injury?"
+• "Generic 2,000-calorie diet plans online never match my metabolism or daily energy levels."
+• "I wish I had a private, 24/7 AI coach I could ask basic questions to without feeling judged."
+• "Will I be able to stay disciplined this time, or will I burn out and quit after two weeks?"
+• "Why am I working out consistently without seeing noticeable reduction in body fat?"
+
+[DOES]
+• Downloads multiple calorie and fitness tracking apps, but drops them within a week due to manual friction.
+• Spends 30+ minutes scrolling YouTube and Instagram reels trying to piece together a workout routine.
+• Lifts weights or does bodyweight circuits without structured progressive overload, sets, or rest timers.
+• Tries extreme crash diets (keto, severe caloric cuts), but rebounds due to fatigue and unsustainable restriction.
+• Frequently skips workout sessions whenever overtime work piles up because routines aren't flexible.
+
+[FEELS]
+• Overwhelmed: By contradictory fitness advice, calorie counting, and complex workout jargon.
+• Intimidated: Entering crowded gym weight rooms without clear instruction or form cues.
+• Frustrated: Putting in effort for weeks without visible fat loss or muscle tone due to improper metabolic balance.
+• Guilty: Whenever skipping consecutive workout days due to exhaustion or long work hours.
+• Hopeful: For a personalized, scientifically backed, and flexible system that adapts to their lifestyle.`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Empathy Map content copied to clipboard!");
+      });
+    }
+  </script>
+</body>
+</html>

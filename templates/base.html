@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FitBuddy - AI Fitness & Nutrition Architect{% endblock %}</title>
+  <meta name="description" content="Hyper-personalized fitness routines, precision metabolic nutrition blueprints, and conversational AI coaching powered by FastAPI, SQLite, and Google Gemini.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <span class="brand-icon">⚡</span>
+      <span class="brand-text">FitBuddy</span>
+    </a>
+
+    <div class="nav-actions">
+      <a href="/empathy-map" class="badge" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-decoration: none; padding: 0.35rem 0.75rem; border-radius: 9999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" target="_blank">
+        📄 Empathy Map
+      </a>
+      <span class="badge badge-emerald">FastAPI + SQLite</span>
+      <span class="badge badge-cyan">Gemini 3.8 Flash</span>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <input 
+          type="password" 
+          id="navApiKey" 
+          class="form-control" 
+          placeholder="Paste Gemini API Key (or use Demo Mode)" 
+          style="width: 270px; padding: 0.5rem 0.8rem; font-size: 0.8rem;"
+        >
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="app-container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- FOOTER -->
+  <footer style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: 4rem;">
+    <p>⚡ <b>FitBuddy AI Architecture</b> • Built with <b>FastAPI</b>, <b>SQLAlchemy (SQLite)</b>, <b>Jinja2</b>, and <b>Google Gemini GenAI</b>.</p>
+    <p style="margin-top: 0.4rem; font-size: 0.78rem;">Disclaimer: FitBuddy provides educational fitness and nutritional modeling. Consult a physician before beginning any strenuous physical exercise.</p>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+  {% block scripts_extra %}{% endblock %}
+</body>
+</html>
